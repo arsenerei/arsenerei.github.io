@@ -12,7 +12,7 @@ http://arsenerei.com/
 arsenerei blog
 </description>
 <lastBuildDate>
-Sun, 26 Feb 2017 15:15:31 -0800
+Sun, 26 Feb 2017 15:36:23 -0800
 </lastBuildDate>
 <generator>
 clj-rss
@@ -57,7 +57,7 @@ Introducing vim-sayid
 | c =&amp;gt; 3 
 | returned =&amp;gt;  0 
 &amp;#94; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Now we're getting somewhere. Recall that we evaluated &lt;code&gt;&amp;#40;math 1 2 3&amp;#41;&lt;/code&gt; and we got back &lt;code&gt;0&lt;/code&gt;. Sayid has the log of that. That's great to see, but we can do _even better_.&lt;/p&gt;&lt;p&gt;Let's hit backspace to return to the workspace. With our cursor back over the &lt;code&gt;sayid-test.core/math&lt;/code&gt; line, let's try out &lt;code&gt;id&lt;/code&gt; (think &quot;inspect descendents&quot;).&lt;/p&gt;&lt;pre&gt;&lt;code&gt;v sayid-test.core/math  :22109
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Now we're getting somewhere. Recall that we evaluated &lt;code&gt;&amp;#40;math 1 2 3&amp;#41;&lt;/code&gt; and we got back &lt;code&gt;0&lt;/code&gt;. Sayid has the log of that. That's great to see, but we can do &lt;i&gt;even better&lt;/i&gt;.&lt;/p&gt;&lt;p&gt;Let's hit backspace to return to the workspace. With our cursor back over the &lt;code&gt;sayid-test.core/math&lt;/code&gt; line, let's try out &lt;code&gt;id&lt;/code&gt; (think &quot;inspect descendents&quot;).&lt;/p&gt;&lt;pre&gt;&lt;code&gt;v sayid-test.core/math  :22109
 | a =&amp;gt; 1 
 | b =&amp;gt; 2 
 | c =&amp;gt; 3 
@@ -73,7 +73,7 @@ Introducing vim-sayid
 | c =&amp;gt; 3 
 | returned =&amp;gt;  0 
 &amp;#94; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Pay dirt.&lt;/p&gt;&lt;p&gt;&lt;code&gt;id&lt;/code&gt; gives us the inputs and outputs of trace &lt;code&gt;:22109&lt;/code&gt; and _all its descendents_. Take a look at the input and output of &lt;code&gt;mul&lt;/code&gt;. Hey! &lt;code&gt;&amp;#40;mul 2 3&amp;#41;&lt;/code&gt; came back as &lt;code&gt;-1&lt;/code&gt;. I bet there's a bug in &lt;code&gt;mul&lt;/code&gt;.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;defn mul &amp;#91;a b&amp;#93;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Pay dirt.&lt;/p&gt;&lt;p&gt;&lt;code&gt;id&lt;/code&gt; gives us the inputs and outputs of trace &lt;code&gt;:22109&lt;/code&gt; and &lt;i&gt;all its descendents&lt;/i&gt;. Take a look at the input and output of &lt;code&gt;mul&lt;/code&gt;. Hey! &lt;code&gt;&amp;#40;mul 2 3&amp;#41;&lt;/code&gt; came back as &lt;code&gt;-1&lt;/code&gt;. I bet there's a bug in &lt;code&gt;mul&lt;/code&gt;.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;defn mul &amp;#91;a b&amp;#93;
   &amp;#40;- a b&amp;#41;&amp;#41;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Wait a second...we should be &lt;i&gt;multiplying&lt;/i&gt;, not &lt;i&gt;subtracting&lt;/i&gt;. Let's fix that.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;defn mul &amp;#91;a b&amp;#93;
   &amp;#40;&amp;#42; a b&amp;#41;&amp;#41;

@@ -90,7 +90,7 @@
 | c =&gt; 3 
 | returned =&gt;  0 
 &#94; 
-</code></pre><p>Now we're getting somewhere. Recall that we evaluated <code>&#40;math 1 2 3&#41;</code> and we got back <code>0</code>. Sayid has the log of that. That's great to see, but we can do _even better_.</p><p>Let's hit backspace to return to the workspace. With our cursor back over the <code>sayid-test.core/math</code> line, let's try out <code>id</code> (think "inspect descendents").</p><pre><code>v sayid-test.core/math  :22109
+</code></pre><p>Now we're getting somewhere. Recall that we evaluated <code>&#40;math 1 2 3&#41;</code> and we got back <code>0</code>. Sayid has the log of that. That's great to see, but we can do <i>even better</i>.</p><p>Let's hit backspace to return to the workspace. With our cursor back over the <code>sayid-test.core/math</code> line, let's try out <code>id</code> (think "inspect descendents").</p><pre><code>v sayid-test.core/math  :22109
 | a =&gt; 1 
 | b =&gt; 2 
 | c =&gt; 3 
@@ -106,7 +106,7 @@
 | c =&gt; 3 
 | returned =&gt;  0 
 &#94; 
-</code></pre><p>Pay dirt.</p><p><code>id</code> gives us the inputs and outputs of trace <code>:22109</code> and _all its descendents_. Take a look at the input and output of <code>mul</code>. Hey! <code>&#40;mul 2 3&#41;</code> came back as <code>-1</code>. I bet there's a bug in <code>mul</code>.</p><pre><code class="clojure">&#40;defn mul &#91;a b&#93;
+</code></pre><p>Pay dirt.</p><p><code>id</code> gives us the inputs and outputs of trace <code>:22109</code> and <i>all its descendents</i>. Take a look at the input and output of <code>mul</code>. Hey! <code>&#40;mul 2 3&#41;</code> came back as <code>-1</code>. I bet there's a bug in <code>mul</code>.</p><pre><code class="clojure">&#40;defn mul &#91;a b&#93;
   &#40;- a b&#41;&#41;
 </code></pre><p>Wait a second...we should be <i>multiplying</i>, not <i>subtracting</i>. Let's fix that.</p><pre><code class="clojure">&#40;defn mul &#91;a b&#93;
   &#40;&#42; a b&#41;&#41;
