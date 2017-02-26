@@ -12,7 +12,7 @@ http://arsenerei.com/
 arsenerei blog
 </description>
 <lastBuildDate>
-Sun, 26 Feb 2017 15:10:50 -0800
+Sun, 26 Feb 2017 15:15:31 -0800
 </lastBuildDate>
 <generator>
 clj-rss
@@ -77,7 +77,7 @@ Introducing vim-sayid
   &amp;#40;- a b&amp;#41;&amp;#41;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Wait a second...we should be &lt;i&gt;multiplying&lt;/i&gt;, not &lt;i&gt;subtracting&lt;/i&gt;. Let's fix that.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;defn mul &amp;#91;a b&amp;#93;
   &amp;#40;&amp;#42; a b&amp;#41;&amp;#41;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Excellent, now we'll reload the namespace. We need to trace the namespace with &lt;code&gt;gst&lt;/code&gt; again. Let's evaluate &lt;code&gt;&amp;#40;math 1 2 3&amp;#41;&lt;/code&gt; one more time!&lt;/p&gt;&lt;p&gt;Sweet! It's &lt;code&gt;7&lt;/code&gt;. Exactly what we wanted. I leave it to you to figure out how to inspect the results in the Sayid workspace.&lt;/p&gt;&lt;h2 id=&quot;this&amp;#95;is&amp;#95;just&amp;#95;the&amp;#95;tip&amp;#95;of&amp;#95;the&amp;#95;iceberg&quot;&gt;This is just the tip of the iceberg&lt;/h2&gt;&lt;p&gt;This was a pretty simple example, and certainly we could have figured it out with a simple read of our go. But imagine instead of one namespace, it's five. And instead of two functions, it's twenty. Sayid can handle all that and more.&lt;/p&gt;&lt;p&gt;So, take a look at &lt;a href='https://github.com/arsenerei/vim-sayid'&gt;vim-sayid&lt;/a&gt;. If you're doing Clojure development on Vim, it's a pretty nifty tool that can help you out of a bind.&lt;/p&gt;&lt;h2 id=&quot;thanks!&quot;&gt;Thanks!&lt;/h2&gt;&lt;p&gt;Thanks to Bill Piel for writing &lt;a href='http://bpiel.github.io/sayid/'&gt;Sayid&lt;/a&gt;, to Tim Pope for writing &lt;a href='https://github.com/tpope/vim-fireplace'&gt;vim-fireplace&lt;/a&gt; and to Steve Losh for writing [an awesome guide on writing Vim plugins][vimscript]!&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Excellent, now we'll reload the namespace. We need to trace the namespace with &lt;code&gt;gst&lt;/code&gt; again. Let's evaluate &lt;code&gt;&amp;#40;math 1 2 3&amp;#41;&lt;/code&gt; one more time!&lt;/p&gt;&lt;p&gt;Sweet! It's &lt;code&gt;7&lt;/code&gt;. Exactly what we wanted. I leave it to you to figure out how to inspect the results in the Sayid workspace.&lt;/p&gt;&lt;h2 id=&quot;this&amp;#95;is&amp;#95;just&amp;#95;the&amp;#95;tip&amp;#95;of&amp;#95;the&amp;#95;iceberg&quot;&gt;This is just the tip of the iceberg&lt;/h2&gt;&lt;p&gt;This was a pretty simple example, and certainly we could have figured it out with a simple read of our go. But imagine instead of one namespace, it's five. And instead of two functions, it's twenty. Sayid can handle all that and more.&lt;/p&gt;&lt;p&gt;So, take a look at &lt;a href='https://github.com/arsenerei/vim-sayid'&gt;vim-sayid&lt;/a&gt;. If you're doing Clojure development on Vim, it's a pretty nifty tool that can help you out of a bind.&lt;/p&gt;&lt;h2 id=&quot;thanks!&quot;&gt;Thanks!&lt;/h2&gt;&lt;p&gt;Thanks to Bill Piel for writing &lt;a href='http://bpiel.github.io/sayid/'&gt;Sayid&lt;/a&gt;, to Tim Pope for writing &lt;a href='https://github.com/tpope/vim-fireplace'&gt;vim-fireplace&lt;/a&gt; and to Steve Losh for writing &lt;a href='http://learnvimscriptthehardway.stevelosh.com/'&gt;an awesome guide on writing Vim plugins&lt;/a&gt;!&lt;/p&gt;
 </description>
 <enclosure>
 
