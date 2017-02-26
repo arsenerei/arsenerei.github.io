@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>
+<channel>
+<atom:link href='http://arsenerei.com/' rel='self' type='application/rss+xml'/>
+<title>
+arsenerei blog
+</title>
+<link>
+http://arsenerei.com/
+</link>
+<description>
+arsenerei blog
+</description>
+<lastBuildDate>
+Sat, 25 Feb 2017 20:37:09 -0800
+</lastBuildDate>
+<generator>
+clj-rss
+</generator>
+<item>
+<guid>
+http://arsenerei.com/blog/posts/2017-02-24-vim-sayid/
+</guid>
+<link>
+http://arsenerei.com/blog/posts/2017-02-24-vim-sayid/
+</link>
+<title>
+Introducing vim-sayid
+</title>
+<description>
+&lt;p&gt;If you saw the &lt;a href='https://www.youtube.com/watch?v=ipDhvd1NsmE'&gt;video&lt;/a&gt; for &lt;a href='http://bpiel.github.io/sayid/'&gt;Sayid&lt;/a&gt;, I bet the first thing you thought was, &quot;Wow, too bad that only works for Emacs. Someone should write a Vim plugin for that.&quot; So did I! And so I did!&lt;/p&gt;&lt;p&gt;&lt;a href='https://github.com/arsenerei/vim-sayid'&gt;vim-sayid&lt;/a&gt;&lt;/p&gt;&lt;h2 id=&quot;what&amp;#95;is&amp;#95;sayid?&quot;&gt;What is Sayid?&lt;/h2&gt;&lt;p&gt;Sayid is a Clojure debugger created by Bill Piel. It allows you to inspect the input and output of functions that you mark to be traced.&lt;/p&gt;&lt;h2 id=&quot;a&amp;#95;brief&amp;#95;aside&quot;&gt;A brief aside&lt;/h2&gt;&lt;p&gt;It was two long weekends learning how Sayid, nREPL middleware, Emacs LISP and Vim plugins work. And then of course making my own plugin work. Even with limited documentation, the nREPL-specific Sayid code was pretty straightforward to read.&lt;/p&gt;&lt;p&gt;One neat trick Bill employed to create a Var to find all other Vars in the namespace tagged with &lt;code&gt;:nrepl&lt;/code&gt;.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;def sayid-nrepl-ops
+  &amp;#40;-&amp;gt;&amp;gt; &amp;#42;ns&amp;#42;
+       ns-interns
+       vals
+       &amp;#40;filter #&amp;#40;-&amp;gt; % meta :nrepl&amp;#41;&amp;#41;
+       &amp;#40;map #&amp;#40;vector &amp;#40;-&amp;gt; % meta :name str&amp;#41; %&amp;#41;&amp;#41;
+       &amp;#40;into {}&amp;#41;&amp;#41;&amp;#41;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Later on he uses this to automatically build the nREPL-middleware functions.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;set-descriptor!
+  #'wrap-sayid
+  {:handles &amp;#40;zipmap &amp;#40;keys sayid-nrepl-ops&amp;#41;
+                    &amp;#40;repeat {:doc &amp;quot;docs?&amp;quot;
+                             :returns {}
+                             :requires {}}&amp;#41;&amp;#41;}&amp;#41;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;I think that's pretty cool!&lt;/p&gt;&lt;h2 id=&quot;what&amp;#95;is&amp;#95;vim-sayid?&quot;&gt;What is vim-sayid?&lt;/h2&gt;&lt;p&gt;vim-sayid is a Vim plugin that allows Clojure developers who use &lt;a href='https://github.com/tpope/vim-fireplace'&gt;vim-fireplace&lt;/a&gt; to debug code with Sayid.&lt;/p&gt;&lt;h2 id=&quot;how&amp;#95;do&amp;#95;we&amp;#95;use&amp;#95;sayid?&quot;&gt;How do we use Sayid?&lt;/h2&gt;&lt;p&gt;Imagine we have two functions, &lt;code&gt;mul&lt;/code&gt; and &lt;code&gt;compute&lt;/code&gt;.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;defn mul &amp;#91;a b&amp;#93;
+  &amp;#40;- a b&amp;#41;&amp;#41;
+
+&amp;#40;defn math &amp;#91;a b c&amp;#93;
+  &amp;#40;+ a &amp;#40;mul b c&amp;#41;&amp;#41;&amp;#41;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;When we evaluate &lt;code&gt;&amp;#40;math 1 2 3&amp;#41;&lt;/code&gt; we'd expect &lt;code&gt;7&lt;/code&gt;, but in fact &lt;code&gt;math&lt;/code&gt; returns &lt;code&gt;0&lt;/code&gt;. That's definitely strange.&lt;/p&gt;&lt;p&gt;While we could follow the flow of the code to find the bug, let's see how Sayid could follow the flow for us!&lt;/p&gt;&lt;h2 id=&quot;debugging&amp;#95;with&amp;#95;vim-sayid&quot;&gt;Debugging with vim-sayid&lt;/h2&gt;&lt;p&gt;First, let's trace the namespace with &lt;code&gt;gst&lt;/code&gt;. Now that we've established tracing, anytime a function in this namespace is evaluated Sayid will have a record of its inputs and outputs.&lt;/p&gt;&lt;p&gt;With that, let's evaluate &lt;code&gt;&amp;#40;math 1 2 3&amp;#41;&lt;/code&gt; again. We get the same result of &lt;code&gt;0&lt;/code&gt;, but let's get a deeper look at &lt;i&gt;why&lt;/i&gt; with Sayid.&lt;/p&gt;&lt;p&gt;&lt;code&gt;gsw&lt;/code&gt; will present us the Sayid workspace, which contain a log of all the function traces.&lt;/p&gt;&lt;pre&gt;&lt;code&gt;v sayid-test.core/math  :22109
+|v sayid-test.core/mul  :22110
+|&amp;#94; 
+| sayid-test.core/math  :22109
+&amp;#94; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Well, well. What do we have here? This shows us that we called &lt;code&gt;math&lt;/code&gt; which, in turn, called &lt;code&gt;mul&lt;/code&gt;. That's great to see, but we can do better.&lt;/p&gt;&lt;p&gt;With our cursor over the &lt;code&gt;sayid-test.core/math&lt;/code&gt; line, let's enter the normal command &lt;code&gt;ii&lt;/code&gt;. This will present us the input and output of specifically Sayid trace &lt;code&gt;:22109&lt;/code&gt;.&lt;/p&gt;&lt;pre&gt;&lt;code&gt;v sayid-test.core/math  :22109
+| a =&amp;gt; 1 
+| b =&amp;gt; 2 
+| c =&amp;gt; 3 
+| returned =&amp;gt;  0 
+&amp;#94; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Now we're getting somewhere. Recall that we evaluated &lt;code&gt;&amp;#40;math 1 2 3&amp;#41;&lt;/code&gt; and we got back &lt;code&gt;0&lt;/code&gt;. Sayid has the log of that. That's great to see, but we can do _even better_.&lt;/p&gt;&lt;p&gt;Let's hit backspace to return to the workspace. With our cursor back over the &lt;code&gt;sayid-test.core/math&lt;/code&gt; line, let's try out &lt;code&gt;id&lt;/code&gt; (think &quot;inspect descendents&quot;).&lt;/p&gt;&lt;pre&gt;&lt;code&gt;v sayid-test.core/math  :22109
+| a =&amp;gt; 1 
+| b =&amp;gt; 2 
+| c =&amp;gt; 3 
+| returns =&amp;gt;  0 
+|v sayid-test.core/mul  :22110
+|| a =&amp;gt; 2 
+|| b =&amp;gt; 3 
+|| returned =&amp;gt;  -1 
+|&amp;#94; 
+| sayid-test.core/math  :22109
+| a =&amp;gt; 1 
+| b =&amp;gt; 2 
+| c =&amp;gt; 3 
+| returned =&amp;gt;  0 
+&amp;#94; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Pay dirt.&lt;/p&gt;&lt;p&gt;&lt;code&gt;id&lt;/code&gt; gives us the inputs and outputs of trace &lt;code&gt;:22109&lt;/code&gt; and _all its descendents_. Take a look at the input and output of &lt;code&gt;mul&lt;/code&gt;. Hey! &lt;code&gt;&amp;#40;mul 2 3&amp;#41;&lt;/code&gt; came back as &lt;code&gt;-1&lt;/code&gt;. I bet there's a bug in &lt;code&gt;mul&lt;/code&gt;.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;defn mul &amp;#91;a b&amp;#93;
+  &amp;#40;- a b&amp;#41;&amp;#41;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Wait a second...we should be &lt;i&gt;multiplying&lt;/i&gt;, not &lt;i&gt;subtracting&lt;/i&gt;. Let's fix that.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;clojure&quot;&gt;&amp;#40;defn mul &amp;#91;a b&amp;#93;
+  &amp;#40;&amp;#42; a b&amp;#41;&amp;#41;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Excellent, now we'll reload the namespace. We need to trace the namespace with &lt;code&gt;gst&lt;/code&gt; again. Let's evaluate &lt;code&gt;&amp;#40;math 1 2 3&amp;#41;&lt;/code&gt; one more time!&lt;/p&gt;&lt;p&gt;Sweet! It's &lt;code&gt;7&lt;/code&gt;. Exactly what we wanted. I leave it to you to figure out how to inspect the results in the Sayid workspace.&lt;/p&gt;&lt;h2 id=&quot;this&amp;#95;is&amp;#95;just&amp;#95;the&amp;#95;tip&amp;#95;of&amp;#95;the&amp;#95;iceberg&quot;&gt;This is just the tip of the iceberg&lt;/h2&gt;&lt;p&gt;This was a pretty simple example, and certainly we could have figured it out with a simple read of our go. But imagine instead of one namespace, it's five. And instead of two functions, it's twenty. Sayid can handle all that and more.&lt;/p&gt;&lt;p&gt;So, take a look at &lt;a href='https://github.com/arsenerei/vim-sayid'&gt;vim-sayid&lt;/a&gt;. If you're doing Clojure development on Vim, it's a pretty nifty tool that can help you out of a bind.&lt;/p&gt;&lt;h2 id=&quot;thanks!&quot;&gt;Thanks!&lt;/h2&gt;&lt;p&gt;Thanks to Bill for writing &lt;a href='http://bpiel.github.io/sayid/'&gt;Sayid&lt;/a&gt;, to Tim for writing &lt;a href='https://github.com/tpope/vim-fireplace'&gt;vim-fireplace&lt;/a&gt; and to Steve for writing &lt;a href='http://learnvimscriptthehardway.stevelosh.com/'&gt;an awesome guide on writing Vim plugins&lt;/a&gt;!&lt;/p&gt;
+</description>
+<enclosure>
+
+</enclosure>
+<pubDate>
+Fri, 24 Feb 2017 00:00:00 -0800
+</pubDate>
+</item>
+</channel>
+</rss>

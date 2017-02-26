@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>arsenerei blog: Introducing vim-sayid</title>
+    <link rel="canonical" href="http://arsenerei.com/blog/posts/2017-02-24-vim-sayid/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Alegreya:400italic,700italic,400,700' rel='stylesheet'
+          type='text/css'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/default.min.css">
+    <link href="/blog/css/screen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+
+<nav class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/blog/">arsenerei blog</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li ><a href="/blog/">Home</a></li>
+                <li
+                ><a href="/blog/archives/">Archives</a></li>
+                
+                <li
+                >
+                <a href="/blog/pages/about/">About</a>
+                </li>
+                
+                <li><a href="/blog/feed.xml">RSS</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div><!--/.container-fluid -->
+</nav>
+
+
+<div class="container">
+
+
+    <div class="row">
+        <div class="col-lg-9">
+            <div id="content">
+                
+<div id="post">
+    <div class="post-header">
+    <div id="post-meta" class="row">
+        <div class="col-lg-6">February 24, 2017</div>
+        
+    </div>
+    <h2>Introducing vim-sayid</h2>
+</div>
+<div>
+    
+    <p>If you saw the <a href='https://www.youtube.com/watch?v=ipDhvd1NsmE'>video</a> for <a href='http://bpiel.github.io/sayid/'>Sayid</a>, I bet the first thing you thought was, "Wow, too bad that only works for Emacs. Someone should write a Vim plugin for that." So did I! And so I did!</p><p><a href='https://github.com/arsenerei/vim-sayid'>vim-sayid</a></p><h2 id="what&#95;is&#95;sayid?">What is Sayid?</h2><p>Sayid is a Clojure debugger created by Bill Piel. It allows you to inspect the input and output of functions that you mark to be traced.</p><h2 id="a&#95;brief&#95;aside">A brief aside</h2><p>It was two long weekends learning how Sayid, nREPL middleware, Emacs LISP and Vim plugins work. And then of course making my own plugin work. Even with limited documentation, the nREPL-specific Sayid code was pretty straightforward to read.</p><p>One neat trick Bill employed to create a Var to find all other Vars in the namespace tagged with <code>:nrepl</code>.</p><pre><code class="clojure">&#40;def sayid-nrepl-ops
+  &#40;-&gt;&gt; &#42;ns&#42;
+       ns-interns
+       vals
+       &#40;filter #&#40;-&gt; % meta :nrepl&#41;&#41;
+       &#40;map #&#40;vector &#40;-&gt; % meta :name str&#41; %&#41;&#41;
+       &#40;into {}&#41;&#41;&#41;
+</code></pre><p>Later on he uses this to automatically build the nREPL-middleware functions.</p><pre><code class="clojure">&#40;set-descriptor!
+  #'wrap-sayid
+  {:handles &#40;zipmap &#40;keys sayid-nrepl-ops&#41;
+                    &#40;repeat {:doc &quot;docs?&quot;
+                             :returns {}
+                             :requires {}}&#41;&#41;}&#41;
+</code></pre><p>I think that's pretty cool!</p><h2 id="what&#95;is&#95;vim-sayid?">What is vim-sayid?</h2><p>vim-sayid is a Vim plugin that allows Clojure developers who use <a href='https://github.com/tpope/vim-fireplace'>vim-fireplace</a> to debug code with Sayid.</p><h2 id="how&#95;do&#95;we&#95;use&#95;sayid?">How do we use Sayid?</h2><p>Imagine we have two functions, <code>mul</code> and <code>compute</code>.</p><pre><code class="clojure">&#40;defn mul &#91;a b&#93;
+  &#40;- a b&#41;&#41;
+
+&#40;defn math &#91;a b c&#93;
+  &#40;+ a &#40;mul b c&#41;&#41;&#41;
+</code></pre><p>When we evaluate <code>&#40;math 1 2 3&#41;</code> we'd expect <code>7</code>, but in fact <code>math</code> returns <code>0</code>. That's definitely strange.</p><p>While we could follow the flow of the code to find the bug, let's see how Sayid could follow the flow for us!</p><h2 id="debugging&#95;with&#95;vim-sayid">Debugging with vim-sayid</h2><p>First, let's trace the namespace with <code>gst</code>. Now that we've established tracing, anytime a function in this namespace is evaluated Sayid will have a record of its inputs and outputs.</p><p>With that, let's evaluate <code>&#40;math 1 2 3&#41;</code> again. We get the same result of <code>0</code>, but let's get a deeper look at <i>why</i> with Sayid.</p><p><code>gsw</code> will present us the Sayid workspace, which contain a log of all the function traces.</p><pre><code>v sayid-test.core/math  :22109
+|v sayid-test.core/mul  :22110
+|&#94; 
+| sayid-test.core/math  :22109
+&#94; 
+</code></pre><p>Well, well. What do we have here? This shows us that we called <code>math</code> which, in turn, called <code>mul</code>. That's great to see, but we can do better.</p><p>With our cursor over the <code>sayid-test.core/math</code> line, let's enter the normal command <code>ii</code>. This will present us the input and output of specifically Sayid trace <code>:22109</code>.</p><pre><code>v sayid-test.core/math  :22109
+| a =&gt; 1 
+| b =&gt; 2 
+| c =&gt; 3 
+| returned =&gt;  0 
+&#94; 
+</code></pre><p>Now we're getting somewhere. Recall that we evaluated <code>&#40;math 1 2 3&#41;</code> and we got back <code>0</code>. Sayid has the log of that. That's great to see, but we can do _even better_.</p><p>Let's hit backspace to return to the workspace. With our cursor back over the <code>sayid-test.core/math</code> line, let's try out <code>id</code> (think "inspect descendents").</p><pre><code>v sayid-test.core/math  :22109
+| a =&gt; 1 
+| b =&gt; 2 
+| c =&gt; 3 
+| returns =&gt;  0 
+|v sayid-test.core/mul  :22110
+|| a =&gt; 2 
+|| b =&gt; 3 
+|| returned =&gt;  -1 
+|&#94; 
+| sayid-test.core/math  :22109
+| a =&gt; 1 
+| b =&gt; 2 
+| c =&gt; 3 
+| returned =&gt;  0 
+&#94; 
+</code></pre><p>Pay dirt.</p><p><code>id</code> gives us the inputs and outputs of trace <code>:22109</code> and _all its descendents_. Take a look at the input and output of <code>mul</code>. Hey! <code>&#40;mul 2 3&#41;</code> came back as <code>-1</code>. I bet there's a bug in <code>mul</code>.</p><pre><code class="clojure">&#40;defn mul &#91;a b&#93;
+  &#40;- a b&#41;&#41;
+</code></pre><p>Wait a second...we should be <i>multiplying</i>, not <i>subtracting</i>. Let's fix that.</p><pre><code class="clojure">&#40;defn mul &#91;a b&#93;
+  &#40;&#42; a b&#41;&#41;
+</code></pre><p>Excellent, now we'll reload the namespace. We need to trace the namespace with <code>gst</code> again. Let's evaluate <code>&#40;math 1 2 3&#41;</code> one more time!</p><p>Sweet! It's <code>7</code>. Exactly what we wanted. I leave it to you to figure out how to inspect the results in the Sayid workspace.</p><h2 id="this&#95;is&#95;just&#95;the&#95;tip&#95;of&#95;the&#95;iceberg">This is just the tip of the iceberg</h2><p>This was a pretty simple example, and certainly we could have figured it out with a simple read of our go. But imagine instead of one namespace, it's five. And instead of two functions, it's twenty. Sayid can handle all that and more.</p><p>So, take a look at <a href='https://github.com/arsenerei/vim-sayid'>vim-sayid</a>. If you're doing Clojure development on Vim, it's a pretty nifty tool that can help you out of a bind.</p><h2 id="thanks!">Thanks!</h2><p>Thanks to Bill for writing <a href='http://bpiel.github.io/sayid/'>Sayid</a>, to Tim for writing <a href='https://github.com/tpope/vim-fireplace'>vim-fireplace</a> and to Steve for writing <a href='http://learnvimscriptthehardway.stevelosh.com/'>an awesome guide on writing Vim plugins</a>!</p>
+</div>
+
+<div id="post-tags">
+    <b>Tags: </b>
+    
+    <a href="/blog/tags/vim-sayid/">vim-sayid</a>
+    
+    <a href="/blog/tags/clojure/">clojure</a>
+    
+    <a href="/blog/tags/vim/">vim</a>
+    
+    <a href="/blog/tags/vim-plugins/">vim-plugins</a>
+    
+    <a href="/blog/tags/sayid/">sayid</a>
+    
+</div>
+
+
+    <div id="prev-next">
+        
+        
+    </div>
+
+    
+
+
+</div>
+
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div id="sidebar">
+                
+                
+                <div id="recent">
+                    <h3>Recent Posts</h3>
+                    <ul>
+                        
+                        <li><a href="/blog/posts/2017-02-24-vim-sayid/">Introducing vim-sayid</a></li>
+                        
+                    </ul>
+                </div>
+                
+                
+                <div id="tags">
+                    <h3>Tags</h3>
+                    <ul>
+                        
+                        <li><a href="/blog/tags/vim-sayid/">vim-sayid</a></li>
+                        
+                        <li><a href="/blog/tags/clojure/">clojure</a></li>
+                        
+                        <li><a href="/blog/tags/vim/">vim</a></li>
+                        
+                        <li><a href="/blog/tags/vim-plugins/">vim-plugins</a></li>
+                        
+                        <li><a href="/blog/tags/sayid/">sayid</a></li>
+                        
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <footer>Copyright &copy; 2017 arsenerei
+        <p style="text-align: center;">Powered by <a href="http://cryogenweb.org">Cryogen</a></p></footer>
+</div>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="/blog/js/highlight.pack.js" type="text/javascript"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+ <link rel="stylesheet" type="text/css" href=nil>
+<script>
+window.klipse_settings = null;
+</script>
+<script src=nil></script> 
+
+</body>
+</html>
